@@ -17,3 +17,6 @@ npm-debug.log*
 # Config local do Claude Code — chegou a guardar tokens em texto puro no
 # historico de permissoes (allowlist de comandos ja rodados). Nunca versionar.
 .claude/
+
+.vercel
+.env*
