@@ -20,3 +20,6 @@ npm-debug.log*
 
 .vercel
 .env*
+
+# Saida do scripts/debug-live.mjs
+scripts/debug-live-screenshot.png

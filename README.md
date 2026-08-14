@@ -12,6 +12,53 @@ npm run dev
 
 A aplicação sobe em `http://localhost:5173`.
 
+## Deploy (Vercel)
+
+Produção: **https://agendamento.drmanuelataide.com.br** — projeto Vercel
+`drmanuel-agendamento`, deploy automático a cada push em `main` (integração
+GitHub já conectada). `vercel.json` tem o rewrite de SPA — sem ele, recarregar
+`/agendar`, `/login` etc. direto no navegador dá 404.
+
+Variáveis de ambiente do projeto na Vercel: só `VITE_SUPABASE_URL` e
+`VITE_SUPABASE_ANON_KEY` (Production + Preview). Nunca adicione
+`VITE_SUPABASE_ACCESS_TOKEN` lá — o prefixo `VITE_` faz o Vite embutir a
+variável no JS público, e esse token dá acesso de admin ao Supabase.
+
+### Incidente 14/08/2026: tela em branco em produção
+
+O domínio já tinha sido apontado para um projeto Vercel diferente do que criei
+(`drmanuel-agendamento`, conectado ao mesmo repositório GitHub) antes de eu
+perceber — esse projeto tinha `VITE_SUPABASE_ACCESS_TOKEN` guardado com
+prefixo `VITE_` (confirmei que não vazou pro bundle publicado, mas removi).
+Depois da limpeza, o site carregava mas ficava com a **tela toda branca** —
+`curl` em todas as rotas dava 200 porque o HTML/JS chegava certinho, só que o
+`VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` daquele projeto estavam com valor
+vazio ou corrompido no momento do build (a Vercel não deixa reler variável
+`Sensitive` depois de criada, então não dava pra confirmar o valor direto).
+`supabase.ts` lançava `throw new Error(...)` no boot, e sem um `ErrorBoundary`
+isso derrubava a árvore inteira do React sem deixar rastro na tela.
+
+Como resolvi:
+
+1. Apaguei e recriei `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` com os
+   valores confirmados do `.env` local.
+2. Escrevi `scripts/debug-live.mjs` (Playwright) pra abrir a URL num Chromium
+   de verdade e capturar erro de runtime — é o que achou a causa: `curl` não
+   executa JavaScript, então nunca pegaria isso.
+3. Adicionei `src/components/ErrorBoundary.tsx`, envolvendo o `<App />` em
+   `main.tsx` — qualquer erro futuro agora mostra uma tela com botão de
+   recarregar em vez de ficar em branco silenciosamente.
+
+```bash
+node scripts/debug-live.mjs https://agendamento.drmanuelataide.com.br/
+```
+
+Roda contra qualquer URL, imprime erros de console, exceções não tratadas e
+requisições que falharam, e salva um screenshot em
+`scripts/debug-live-screenshot.png`. Vale rodar depois de qualquer deploy que
+mexa em env vars ou no bootstrap do app — `curl` sozinho não teria pego esse
+bug.
+
 ## Login (Prompt 3)
 
 Dashboard, Contatos e Agendamentos agora exigem sessão logada (Supabase Auth,
