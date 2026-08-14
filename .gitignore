@@ -1,0 +1,19 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+
+# Contem o access token da Management API — nunca versionar.
+.env
+.env.*
+!.env.example
+
+logs
+*.log
+npm-debug.log*
+.vite
+
+# Config local do Claude Code — chegou a guardar tokens em texto puro no
+# historico de permissoes (allowlist de comandos ja rodados). Nunca versionar.
+.claude/

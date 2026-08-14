@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /*
+   * Tokens no formato esperado pelo Shadcn/UI, com os valores da paleta da
+   * clínica. Assim `npx shadcn@latest add <componente>` continua funcionando
+   * sem precisar reescrever as cores do componente gerado.
+   */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 217 33% 17%; /* #1E293B */
+
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
+
+    --primary: 217 91% 60%; /* #3B82F6 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%; /* #F1F5F9 */
+    --secondary-foreground: 217 33% 17%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%; /* #64748B */
+
+    --accent: 214 100% 97%; /* #EFF6FF */
+    --accent-foreground: 217 91% 60%;
+
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%; /* #E2E8F0 */
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+  }
+
+  html {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas text-ink;
+  }
+
+  * {
+    @apply border-hairline;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar discreta para o resumo da conversa e a tabela de contatos. */
+  .scrollbar-slim {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+  }
+}
