@@ -35,12 +35,14 @@ export function AppointmentsTable({
 
   return (
     <div className="max-h-[calc(100vh-320px)] overflow-auto scrollbar-slim">
-      <table className="w-full min-w-[860px] border-collapse text-left text-sm">
+      <table className="w-full min-w-[1080px] border-collapse text-left text-sm">
         <thead className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_#E2E8F0]">
           <tr className="border-b border-hairline">
             <Th>Nome</Th>
             <Th>WhatsApp</Th>
             <Th>Procedimento</Th>
+            <Th>Cidade</Th>
+            <Th>Clínica</Th>
             <Th>Data</Th>
             <Th>Horário</Th>
             <Th>Agendado em</Th>
@@ -77,6 +79,8 @@ export function AppointmentsTable({
                   )}
                 </Td>
                 <Td>{appointment.procedimento}</Td>
+                <Td>{appointment.cidade}</Td>
+                <Td>{appointment.clinica}</Td>
                 <Td className="tabular-nums">
                   {formatDateOnly(appointment.data_agendamento)}
                 </Td>
@@ -131,6 +135,8 @@ function TableSkeleton() {
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-4 w-36" />
           <Skeleton className="h-4 flex-1" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-28" />
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-16" />
           <Skeleton className="h-4 w-32" />

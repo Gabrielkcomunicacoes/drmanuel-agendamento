@@ -14,6 +14,7 @@ import {
   toDateKey,
 } from '@/lib/format'
 import { getHorariosDoDia, isDiaFechado } from '@/lib/horarios'
+import { CIDADES, getClinicasDaCidade } from '@/lib/localizacao'
 import { PROCEDIMENTOS } from '@/lib/procedimentos'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
@@ -22,6 +23,8 @@ interface FormErrors {
   nome?: string
   whatsapp?: string
   procedimento?: string
+  cidade?: string
+  clinica?: string
   data?: string
   horario?: string
 }
@@ -29,6 +32,8 @@ interface FormErrors {
 interface Confirmation {
   nome: string
   procedimento: string
+  cidade: string
+  clinica: string
   dateKey: string
   horario: string
 }
@@ -46,6 +51,8 @@ export default function PublicBooking() {
   const [nome, setNome] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [procedimento, setProcedimento] = useState('')
+  const [cidade, setCidade] = useState('')
+  const [clinica, setClinica] = useState('')
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [selectedHorario, setSelectedHorario] = useState<string | undefined>()
   const [datePickerOpen, setDatePickerOpen] = useState(false)
@@ -62,6 +69,14 @@ export default function PublicBooking() {
     () => (selectedDate ? getHorariosDoDia(selectedDate) : []),
     [selectedDate],
   )
+
+  const clinicasDaCidade = useMemo(() => getClinicasDaCidade(cidade), [cidade])
+
+  // Ao trocar de cidade, a selecao de clinica anterior pode nao existir mais
+  // nessa cidade — reseta, e ja pre-seleciona quando so ha uma opcao.
+  useEffect(() => {
+    setClinica(clinicasDaCidade.length === 1 ? clinicasDaCidade[0] : '')
+  }, [clinicasDaCidade])
 
   // Carrega disponibilidade da data escolhida e assina o Realtime dela.
   useEffect(() => {
@@ -115,6 +130,8 @@ export default function PublicBooking() {
     if (!nome.trim()) next.nome = 'Informe o nome completo'
     if (countDigits(whatsapp) < 10) next.whatsapp = 'Informe um WhatsApp válido'
     if (!procedimento) next.procedimento = 'Selecione um procedimento'
+    if (!cidade) next.cidade = 'Selecione uma cidade'
+    else if (!clinica) next.clinica = 'Selecione uma clínica'
 
     if (!selectedDate) {
       next.data = 'Selecione uma data'
@@ -138,6 +155,8 @@ export default function PublicBooking() {
     setNome('')
     setWhatsapp('')
     setProcedimento('')
+    setCidade('')
+    setClinica('')
     setSelectedDate(undefined)
     setSelectedHorario(undefined)
     setErrors({})
@@ -174,6 +193,8 @@ export default function PublicBooking() {
         // e para o link wa.me da pagina interna funcionar sem tratamento extra.
         whatsapp: `55${whatsapp.replace(/\D/g, '')}`,
         procedimento,
+        cidade,
+        clinica,
         data_agendamento: dateKey,
         horario: selectedHorario,
       })
@@ -181,6 +202,8 @@ export default function PublicBooking() {
       setConfirmation({
         nome: nome.trim(),
         procedimento,
+        cidade,
+        clinica,
         dateKey,
         horario: selectedHorario,
       })
@@ -269,6 +292,47 @@ export default function PublicBooking() {
                     Selecione um procedimento
                   </option>
                   {PROCEDIMENTOS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field label="Cidade" htmlFor="cidade" error={errors.cidade}>
+                <select
+                  id="cidade"
+                  value={cidade}
+                  onChange={(event) => setCidade(event.target.value)}
+                  className={cn(inputClass(Boolean(errors.cidade)), 'appearance-none')}
+                >
+                  <option value="" disabled>
+                    Selecione uma cidade
+                  </option>
+                  {CIDADES.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field label="Clínica" htmlFor="clinica" error={errors.clinica}>
+                <select
+                  id="clinica"
+                  value={clinica}
+                  onChange={(event) => setClinica(event.target.value)}
+                  disabled={!cidade}
+                  className={cn(
+                    inputClass(Boolean(errors.clinica)),
+                    'appearance-none',
+                    !cidade && 'cursor-not-allowed bg-neutral text-muted',
+                  )}
+                >
+                  <option value="" disabled>
+                    {cidade ? 'Selecione uma clínica' : 'Selecione uma cidade primeiro'}
+                  </option>
+                  {clinicasDaCidade.map((item) => (
                     <option key={item} value={item}>
                       {item}
                     </option>
@@ -467,6 +531,14 @@ function ConfirmationView({
           <span className="font-medium text-ink">
             {confirmation.procedimento}
           </span>
+        </p>
+        <p>
+          <span className="text-muted">Cidade: </span>
+          <span className="font-medium text-ink">{confirmation.cidade}</span>
+        </p>
+        <p>
+          <span className="text-muted">Clínica: </span>
+          <span className="font-medium text-ink">{confirmation.clinica}</span>
         </p>
         <p>
           <span className="text-muted">Data: </span>

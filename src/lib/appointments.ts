@@ -11,6 +11,8 @@ export interface Appointment {
   nome: string
   whatsapp: string
   procedimento: string
+  cidade: string
+  clinica: string
   data_agendamento: string
   horario: string
   criado_em: string | null
@@ -20,12 +22,14 @@ export interface NewAppointment {
   nome: string
   whatsapp: string
   procedimento: string
+  cidade: string
+  clinica: string
   data_agendamento: string
   horario: string
 }
 
 const APPOINTMENT_COLUMNS =
-  'id, nome, whatsapp, procedimento, data_agendamento, horario, criado_em'
+  'id, nome, whatsapp, procedimento, cidade, clinica, data_agendamento, horario, criado_em'
 
 /** Total de agendamentos com `data_agendamento >= hoje` — card de resumo. */
 export async function fetchUpcomingAppointmentsCount(

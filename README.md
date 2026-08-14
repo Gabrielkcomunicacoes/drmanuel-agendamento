@@ -229,6 +229,14 @@ formulário só pedindo DDD + número — assim casa com o padrão já usado em
 `crm_estetica.whatsapp_lead` e o link `wa.me` da página interna funciona sem
 tratamento especial.
 
+**`cidade` e `clinica` (15/08/2026):** colunas adicionadas depois, via
+`alter table` — tabela estava vazia, então entraram como `not null` direto,
+sem precisar de backfill. Lista fixa de cidade→clínicas em
+`src/lib/localizacao.ts`, mesmo padrão de `procedimentos.ts`/`horarios.ts`. No
+formulário público, o select de Clínica fica desabilitado até uma Cidade ser
+escolhida; com 1 clínica só na cidade, pré-seleciona sozinha, com mais de uma
+abre vazio para o lead escolher.
+
 ### Página pública `/agendar`
 
 - Sem sidebar, sem autenticação, mobile-first a partir de 375px.
